@@ -33,10 +33,14 @@ class CredStash::Secret
       item = repository.get(name)
       new(
         name: name,
-        key: CredStash::CipherKey.decrypt(Base64.decode64(item.key), context: context),
+        key: CredStash::CipherKey.decrypt(Base64.decode64(item.key), client: kms_client, context: context),
         encrypted_value: Base64.decode64(item.contents),
         hmac: item.hmac
       )
+    end
+
+    def kms_client
+      @kms_client ||= Aws::KMS::Client.new
     end
 
     def repository
